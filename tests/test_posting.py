@@ -81,10 +81,6 @@ def test_default_service_reports_each_unconfigured_platform() -> None:
         mastodon_access_token="",
         bluesky_identifier="",
         bluesky_app_password="",
-        reddit_client_id="",
-        reddit_client_secret="",
-        reddit_refresh_token="",
-        reddit_subreddit="",
         telegram_bot_token="",
         telegram_chat_id="",
         devto_api_key="",
@@ -106,7 +102,6 @@ def test_default_service_reports_each_unconfigured_platform() -> None:
     assert [item["platform"] for item in payload["results"]] == [
         "Mastodon",
         "Bluesky",
-        "Reddit",
         "Telegram",
         "DEV",
     ]

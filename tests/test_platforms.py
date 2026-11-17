@@ -1,6 +1,5 @@
 import asyncio
 import json
-from urllib.parse import parse_qs
 
 import httpx
 
@@ -8,7 +7,6 @@ from app.config import Settings
 from app.platforms.bluesky import BlueskyPlatform
 from app.platforms.devto import DevToPlatform
 from app.platforms.mastodon import MastodonPlatform
-from app.platforms.reddit import RedditPlatform
 from app.platforms.telegram import TelegramPlatform
 
 
@@ -71,42 +69,6 @@ def test_bluesky_creates_a_post_with_link_facet() -> None:
     )
     post = asyncio.run(platform.publish("Launch 🚀 https://example.com"))
     assert post.url == "https://bsky.app/profile/alice.example/post/record-key"
-    assert post.public_access is True
-
-
-def test_reddit_refreshes_token_and_submits_self_post() -> None:
-    def handler(request: httpx.Request) -> httpx.Response:
-        if request.url.path.endswith("/access_token"):
-            assert request.headers["Authorization"].startswith("Basic ")
-            assert b"grant_type=refresh_token" in request.content
-            return httpx.Response(200, json={"access_token": "reddit-access"})
-        assert request.headers["Authorization"] == "Bearer reddit-access"
-        if request.method == "GET":
-            assert request.url.path == "/r/mycommunity/about"
-            return httpx.Response(
-                200,
-                json={"data": {"subreddit_type": "public"}},
-            )
-        fields = parse_qs(request.content.decode())
-        assert fields["kind"] == ["self"]
-        assert fields["sr"] == ["mycommunity"]
-        assert fields["text"] == ["Update https://example.com"]
-        return httpx.Response(
-            200,
-            json={"json": {"data": {"url": "https://reddit.com/r/mycommunity/1"}}},
-        )
-
-    platform = RedditPlatform(
-        Settings(
-            reddit_client_id="client",
-            reddit_client_secret="secret",
-            reddit_refresh_token="refresh",
-            reddit_subreddit="mycommunity",
-        ),
-        transport=httpx.MockTransport(handler),
-    )
-    post = asyncio.run(platform.publish("Update https://example.com"))
-    assert post.url == "https://reddit.com/r/mycommunity/1"
     assert post.public_access is True
 
 

@@ -9,7 +9,6 @@ from app.platforms import (
     BlueskyPlatform,
     DevToPlatform,
     MastodonPlatform,
-    RedditPlatform,
     TelegramPlatform,
 )
 from app.platforms.base import PlatformError, PublishedPost
@@ -91,7 +90,6 @@ def create_posting_service(settings: Settings) -> PostingService:
         [
             MastodonPlatform(settings),
             BlueskyPlatform(settings),
-            RedditPlatform(settings),
             TelegramPlatform(settings),
             DevToPlatform(settings),
         ]

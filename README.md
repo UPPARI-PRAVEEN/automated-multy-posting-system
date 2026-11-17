@@ -1,6 +1,6 @@
 # Automated Multi-Platform Posting System
 
-A FastAPI service that accepts one short message and attempts to publish it through the official APIs for Mastodon, Bluesky, Reddit, Telegram, and DEV. Each platform is handled independently: a platform error is included in that platform's result and does not stop the remaining integrations.
+A FastAPI service that accepts one short message and attempts to publish it through the official APIs for Mastodon, Bluesky, Telegram, and DEV. Each platform is handled independently: a platform error is included in that platform's result and does not stop the remaining integrations.
 
 ## Requirements and setup
 
@@ -36,7 +36,7 @@ Interactive API documentation: <http://localhost:4000/docs>
 }
 ```
 
-Validation errors return HTTP 422. Publishing attempts to all five configured integrations are sequential and independent. The top-level `success` value is true when at least one platform succeeds. A successful response contains the API-returned post URL when available, public-access state, and UTC date/time; a failed result contains the error and null date/time/URL fields. Telegram only returns a public URL when `TELEGRAM_PUBLIC_CHANNEL` is configured; a private chat post can succeed without being publicly accessible.
+Validation errors return HTTP 422. Publishing attempts to all four configured integrations are sequential and independent. The top-level `success` value is true when at least one platform succeeds. A successful response contains the API-returned post URL when available, public-access state, and UTC date/time; a failed result contains the error and null date/time/URL fields. Telegram only returns a public URL when `TELEGRAM_PUBLIC_CHANNEL` is configured; a private chat post can succeed without being publicly accessible.
 
 Example response shape (illustrative; actual values come from the platform API):
 
@@ -70,7 +70,6 @@ Example response shape (illustrative; actual values come from the platform API):
 
 - **Mastodon:** set an instance URL, access token with `write:statuses`, and visibility. `public` and `unlisted` statuses are marked accessible.
 - **Bluesky:** use your handle/identifier and an app password. The adapter creates a session and writes a post record with a rich-text facet for the CTA URL.
-- **Reddit:** provide OAuth app credentials, a refresh token with read/submit permissions, and a target subreddit. A self-post uses the configured title and the submitted text. Public access is reported from the subreddit API's visibility setting.
 - **Telegram:** provide the bot token and chat ID. Add the bot with permission to post in the target channel. Public channel permalinks use the username returned by Telegram, or `TELEGRAM_PUBLIC_CHANNEL` as a fallback.
 - **DEV:** provide an API key; the message is published as the article body with the configured title.
 
@@ -86,6 +85,5 @@ Tests use fake platform publishers and do not send real posts. To demonstrate li
 
 - [Mastodon: Create a status](https://docs.joinmastodon.org/methods/statuses/#create)
 - [Bluesky: Create a record](https://docs.bsky.app/docs/api/com-atproto-repo-create-record) and [create a session](https://docs.bsky.app/docs/api/com-atproto-server-create-session)
-- [Reddit API: Submit a post](https://www.reddit.com/dev/api/#POST_api_submit) and [OAuth2](https://github.com/reddit-archive/reddit/wiki/OAuth2)
 - [Telegram Bot API: sendMessage](https://core.telegram.org/bots/api#sendmessage)
 - [DEV API: Create an article](https://developers.forem.com/api/v1#tag/articles/operation/createArticle)
